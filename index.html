@@ -3,75 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chromatography</title>
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<title>Chromatography Calculator</title>
 
 <style>
 
-body {
-    margin: 0;
-    height: 100vh;
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    overflow: hidden;
+body{
+font-family: Arial;
+background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
 }
 
-/* Background glow effect */
-body::before {
-    content: "";
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(0,255,255,0.3), transparent 70%);
-    animation: moveGlow 10s infinite alternate ease-in-out;
+.container{
+background:rgba(255,255,255,0.1);
+padding:30px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+width:400px;
 }
 
-@keyframes moveGlow {
-    from { transform: translate(-100px, -100px); }
-    to { transform: translate(100px, 100px); }
+h2{text-align:center}
+
+input,button{
+width:100%;
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:8px;
 }
 
-/* Main container */
-.container {
-    text-align: center;
-    padding: 50px;
-    border-radius: 20px;
-    backdrop-filter: blur(15px);
-    background: rgba(255,255,255,0.05);
-    box-shadow: 0 0 30px rgba(0,0,0,0.4);
+button{
+background:#00ffff;
+cursor:pointer;
+font-weight:bold;
 }
 
-/* Chromatography text */
-.title {
-    font-size: 64px;
-    font-weight: 600;
-    color: #00ffff;
-    letter-spacing: 3px;
-    text-shadow: 0 0 15px rgba(0,255,255,0.8);
-    animation: fadeIn 2s ease;
+.result{
+margin-top:15px;
+font-weight:bold;
 }
 
-.subtitle {
-    margin-top: 10px;
-    font-weight: 300;
-    color: #ffffffaa;
-    font-size: 18px;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.hidden{
+display:none;
 }
 
 </style>
@@ -80,9 +57,121 @@ body::before {
 <body>
 
 <div class="container">
-    <div class="title">Chromatography</div>
-    <div class="subtitle">Science • Separation • Precision</div>
+
+<!-- LOGIN -->
+<div id="loginBox">
+<h2>Chromatography Login</h2>
+
+<input type="text" id="user" placeholder="Username">
+<input type="password" id="pass" placeholder="Password">
+
+<button onclick="login()">Đăng nhập</button>
+
 </div>
+
+<!-- APP -->
+<div id="appBox" class="hidden">
+
+<h2>Chromatography Calculator</h2>
+
+<label>Dead time (t0)</label>
+<input id="t0" type="number">
+
+<label>Retention time peak 1 (tR1)</label>
+<input id="tr1" type="number">
+
+<label>Retention time peak 2 (tR2)</label>
+<input id="tr2" type="number">
+
+<label>Peak width 1 (w1)</label>
+<input id="w1" type="number">
+
+<label>Peak width 2 (w2)</label>
+<input id="w2" type="number">
+
+<button onclick="calcRs()">Tính Resolution Rs</button>
+
+<div id="rsResult" class="result"></div>
+
+<hr>
+
+<h3>Tính diện tích pic</h3>
+
+<label>Nhập time (cách nhau dấu phẩy)</label>
+<input id="timeArray">
+
+<label>Nhập intensity (cách nhau dấu phẩy)</label>
+<input id="intensityArray">
+
+<button onclick="calcArea()">Tính diện tích</button>
+
+<div id="areaResult" class="result"></div>
+
+</div>
+
+</div>
+
+<script>
+
+// LOGIN đơn giản
+function login(){
+
+let u=document.getElementById("user").value;
+let p=document.getElementById("pass").value;
+
+if(u==="admin" && p==="1234"){
+
+document.getElementById("loginBox").classList.add("hidden");
+document.getElementById("appBox").classList.remove("hidden");
+
+}else{
+alert("Sai tài khoản");
+}
+
+}
+
+
+// CALC RS
+function calcRs(){
+
+let t0=parseFloat(document.getElementById("t0").value);
+let tr1=parseFloat(document.getElementById("tr1").value);
+let tr2=parseFloat(document.getElementById("tr2").value);
+let w1=parseFloat(document.getElementById("w1").value);
+let w2=parseFloat(document.getElementById("w2").value);
+
+let k1=(tr1-t0)/t0;
+let k2=(tr2-t0)/t0;
+
+let Rs=(2*(tr2-tr1))/(w1+w2);
+
+document.getElementById("rsResult").innerHTML=
+" k1 = "+k1.toFixed(3)+
+"<br> k2 = "+k2.toFixed(3)+
+"<br> Resolution Rs = "+Rs.toFixed(3);
+
+}
+
+
+// PEAK AREA (trapezoidal)
+function calcArea(){
+
+let time=document.getElementById("timeArray").value.split(",").map(Number);
+let inten=document.getElementById("intensityArray").value.split(",").map(Number);
+
+let area=0;
+
+for(let i=0;i<time.length-1;i++){
+
+area += (time[i+1]-time[i])*(inten[i]+inten[i+1])/2;
+
+}
+
+document.getElementById("areaResult").innerHTML="Area = "+area.toFixed(3);
+
+}
+
+</script>
 
 </body>
 </html>
